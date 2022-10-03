@@ -21,12 +21,24 @@
         "composer-plugin-api": "^2.0.0"
     },
     "require-dev": {
-        "composer/composer": "2.0.*@dev"
+        "composer/composer": "2.0.*@dev",
+        "overtrue/phplint": "^2.4.1"
     },
     "autoload": {
         "psr-4": {
             "SBUERK\\TYPO3CmsComposerInstallersTestingFrameworkBridge\\": "src/"
         }
+    },
+    "scripts": {
+        "ci:tests": [
+            "@ci:php:lint"
+        ],
+        "ci:php:lint": [
+            "@php vendor/bin/phplint --configuration=Build/phplint/phplint.yml"
+        ]
+    },
+    "scripts-descriptions": {
+        "ci:php:lint": "Lint php files"
     },
     "extra": {
         "class": "SBUERK\\TYPO3CmsComposerInstallersTestingFrameworkBridge\\Installer\\Plugin"
