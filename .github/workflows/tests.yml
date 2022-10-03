@@ -56,3 +56,6 @@ jobs:
 
       - name: CGL
         run: composer cgl:check
+
+      - name: Static Code Analysis
+        run: composer ci:phpstan:check-github

@@ -23,7 +23,9 @@
     "require-dev": {
         "composer/composer": "2.0.*@dev",
         "friendsofphp/php-cs-fixer": "^3.4.0",
-        "overtrue/phplint": "^2.4.1"
+        "overtrue/phplint": "^2.4.1",
+        "phpstan/phpstan": "^1.8.4",
+        "phpstan/phpstan-strict-rules": "^1.4.3"
     },
     "autoload": {
         "psr-4": {
@@ -42,13 +44,25 @@
         ],
         "ci:php:lint": [
             "@php vendor/bin/phplint --configuration=Build/phplint/phplint.yml"
+        ],
+        "ci:phpstan:check": [
+            "@php vendor/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress --no-interaction --memory-limit 4G"
+        ],
+        "ci:phpstan:check-github": [
+            "@php vendor/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress --no-interaction --memory-limit 4G --error-format=github"
+        ],
+        "ci:phpstan:baseline": [
+            "@php vendor/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress --no-interaction --memory-limit 4G --generate-baseline=Build/phpstan/phpstan-baseline.neon"
         ]
     },
     "scripts-descriptions": {
         "cgl:check": "Check all php files for CGL compliance and report violations.",
         "cgl:fix": "Check all php files for CGL compliance and fix violations.",
         "ci:tests": "Execute multipe tests in chain",
-        "ci:php:lint": "Lint php files"
+        "ci:php:lint": "Lint php files",
+        "ci:phpstan:check": "Run static code analyzer",
+        "ci:phpstan:check-github": "Runstatic code analyzer with github error format for github action workflow.",
+        "ci:phpstan:baseline": "Regenerate phpstan baseline file"
     },
     "extra": {
         "class": "SBUERK\\TYPO3CmsComposerInstallersTestingFrameworkBridge\\Installer\\Plugin"
