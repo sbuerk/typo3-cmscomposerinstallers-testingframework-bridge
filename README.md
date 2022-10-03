@@ -9,7 +9,7 @@ breaks the way testing works.
 
 Until proper overwork of the whole testing infrastructure is done, this plugin provides
 proper symlinked TYPO3 system extension and the extension to the known "legacy paths".
-Thus Unit-, Functional and Acceptance testing works as before without any changes in
+Thus, Unit-, Functional and Acceptance testing works as before without any changes in
 extensions which already tests against TYPO3 v12.
 
 > :warning: **This is an unofficial intermediate workaround, which may vanish anytime.**

@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "composer/composer": "2.0.*@dev",
+        "friendsofphp/php-cs-fixer": "^3.4.0",
         "overtrue/phplint": "^2.4.1"
     },
     "autoload": {
@@ -30,6 +31,12 @@
         }
     },
     "scripts": {
+        "cgl:check": [
+            "@php vendor/bin/php-cs-fixer fix --config=Build/php-cs-fixer/php-cs-fixer.php --dry-run --diff"
+        ],
+        "cgl:fix": [
+            "@php vendor/bin/php-cs-fixer fix --config=Build/php-cs-fixer/php-cs-fixer.php "
+        ],
         "ci:tests": [
             "@ci:php:lint"
         ],
@@ -38,6 +45,9 @@
         ]
     },
     "scripts-descriptions": {
+        "cgl:check": "Check all php files for CGL compliance and report violations.",
+        "cgl:fix": "Check all php files for CGL compliance and fix violations.",
+        "ci:tests": "Execute multipe tests in chain",
         "ci:php:lint": "Lint php files"
     },
     "extra": {

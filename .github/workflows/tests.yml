@@ -53,3 +53,6 @@ jobs:
 
       - name: Lint
         run: composer ci:php:lint
+
+      - name: CGL
+        run: composer cgl:check
