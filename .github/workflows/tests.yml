@@ -18,6 +18,7 @@ jobs:
           - "7.4"
           - "8.0"
           - "8.1"
+          - "8.2"
         composer-version:
           - "v2"
     steps:
@@ -55,6 +56,8 @@ jobs:
         run: composer ci:php:lint
 
       - name: CGL
+        # @todo We cannot run cgl because of cs fixer 7.4 <> 8.1 constraint
+        if: ${{ matrix.php-version <= '8.1' }}
         run: composer cgl:check
 
       - name: Static Code Analysis
