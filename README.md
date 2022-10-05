@@ -20,7 +20,7 @@ This plugin should be only added as development dependency, so it get not shippe
 installed on installation in a instance.
 
 ```shell
-$ composer require --dev sbuerk/typo3-cmscomposerinstallers-testingframework-bridge
+composer require --dev sbuerk/typo3-cmscomposerinstallers-testingframework-bridge
 ```
 
 The plugin uses already provided information and configuration from composer and
