@@ -10,7 +10,10 @@ breaks the way testing works.
 Until proper overwork of the whole testing infrastructure is done, this plugin provides
 proper symlinked TYPO3 system extension and the extension to the known "legacy paths".
 Thus, Unit-, Functional and Acceptance testing works as before without any changes in
-extensions which already tests against TYPO3 v12.
+extensions which already tests against TYPO3 v12. This also helps when using
+`typo3/cms-composer-installers:4.0.0-RC1` with v11.
+
+Starting with `0.1.x` of this composer plugin project level testing is also supported.
 
 > :warning: **This is an unofficial intermediate workaround, which may vanish anytime.**
 

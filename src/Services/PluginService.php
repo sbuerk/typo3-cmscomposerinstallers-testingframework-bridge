@@ -76,11 +76,13 @@ final class PluginService
         $this->linkRootExtensionToVendorFolder();
         $this->buildLegacySysExtMirror();
         $this->buildLegacyExtMirror();
+        $this->buildRootExtesionLegacyExtMirror();
     }
 
     private function handleRootProject(): void
     {
-        $this->io->error('>> Project level bridging is not implemented yet.');
+        $this->buildLegacySysExtMirror();
+        $this->buildLegacyExtMirror();
     }
 
     private function buildLegacySysExtMirror(): void
@@ -105,15 +107,49 @@ final class PluginService
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
             $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
             if ($linked) {
-                $this->io->info(sprintf('>> Linked root extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeSysext));
+                $this->io->info(sprintf('>> Linked system extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeSysext));
             } else {
-                $this->io->error(sprintf('>> Failed to link root extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeSysext));
+                $this->io->error(sprintf('>> Failed to link system extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeSysext));
             }
             $processed[] = $packageName;
         }
     }
 
     private function buildLegacyExtMirror(): void
+    {
+        $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
+        $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
+        $this->filesystem->emptyDirectory($legacyExtPath, true);
+        $rootPackage = $this->rootPackage();
+        $rootPackageIsExtension = $this->packageIsExtension($rootPackage);
+        $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $processed = [];
+        foreach ($packages as $package) {
+            $packageName = $package->getName();
+            if (in_array($packageName, $processed, true)
+                || !$this->packageIsExtension($package)
+                || $this->packageIsCoreExtension($package)
+                || ($rootPackageIsExtension && $rootPackage->getName() === $package->getName())
+            ) {
+                continue;
+            }
+            $extensionKey = $this->getPackageExtensionKey($package);
+            $installationSource = $this->composer->getInstallationManager()->getInstallPath($package);
+            $legacyPackagePath = $legacyExtPath . '/' . $extensionKey;
+            $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
+            $relativeExt = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
+
+            $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+            if ($linked) {
+                $this->io->info(sprintf('>> Linked extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeExt));
+            } else {
+                $this->io->error(sprintf('>> Failed to link extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeExt));
+            }
+            $processed[] = $packageName;
+        }
+    }
+
+    private function buildRootExtesionLegacyExtMirror(): void
     {
         $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
         $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
@@ -231,8 +267,7 @@ final class PluginService
                 $rootPackage = $this->rootPackage();
                 return
                     $this->packageIsExtension($rootPackage)
-                    // || $this->packageIsOfType($rootPackage, 'project')
-;
+                    || $this->packageIsOfType($rootPackage, 'project');
             }
         }
         return false;
