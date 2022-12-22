@@ -1,7 +1,7 @@
 {
     "name": "sbuerk/typo3-cmscomposerinstallers-testingframework-bridge",
     "type": "composer-plugin",
-    "homepage": "https://github.com/sbuerk/composer-files-provider",
+    "homepage": "https://github.com/sbuerk/typo3-cmscomposerinstallers-testingframework-bridge",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
