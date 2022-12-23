@@ -21,7 +21,9 @@ use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Util\Filesystem;
+use Composer\Util\Platform;
 use Composer\Util\ProcessExecutor;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 final class PluginService
 {
@@ -89,7 +91,12 @@ final class PluginService
     {
         $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
         $legacySysExtPath = $this->filesystem->normalizePath($publicPath . '/typo3/sysext');
-        $this->filesystem->emptyDirectory($legacySysExtPath, true);
+        try {
+            $this->filesystem->emptyDirectory($legacySysExtPath, true);
+        } catch (\RuntimeException $exception) {
+            $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacySysExtPath);
+            $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
+        }
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
         $processed = [];
         foreach ($packages as $package) {
@@ -105,7 +112,18 @@ final class PluginService
             $legacyPackagePath = $legacySysExtPath . '/' . $extensionKey;
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
-            $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+
+            if (Platform::isWindows()) {
+                try {
+                    $this->filesystem->junction($installationSource, $legacyPackagePath);
+                    $linked = true;
+                } catch (IOException $e) {
+                    $linked = false;
+                }
+            } else {
+                $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+            }
+
             if ($linked) {
                 $this->io->info(sprintf('>> Linked system extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeSysext));
             } else {
@@ -119,7 +137,12 @@ final class PluginService
     {
         $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
         $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
-        $this->filesystem->emptyDirectory($legacyExtPath, true);
+        try {
+            $this->filesystem->emptyDirectory($legacyExtPath, true);
+        } catch (\RuntimeException $exception) {
+            $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyExtPath);
+            $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
+        }
         $rootPackage = $this->rootPackage();
         $rootPackageIsExtension = $this->packageIsExtension($rootPackage);
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
@@ -139,7 +162,17 @@ final class PluginService
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeExt = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
 
-            $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+            if (Platform::isWindows()) {
+                try {
+                    $this->filesystem->junction($installationSource, $legacyPackagePath);
+                    $linked = true;
+                } catch (IOException $e) {
+                    $linked = false;
+                }
+            } else {
+                $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+            }
+
             if ($linked) {
                 $this->io->info(sprintf('>> Linked extension "%s" from "%s" to "%s"', $package->getName(), $relativeVendor, $relativeExt));
             } else {
@@ -153,14 +186,29 @@ final class PluginService
     {
         $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
         $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
-        $this->filesystem->emptyDirectory($legacyExtPath, true);
+        try {
+            $this->filesystem->emptyDirectory($legacyExtPath, true);
+        } catch (\RuntimeException $exception) {
+            $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyExtPath);
+            $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
+        }
         $package = $this->rootPackage();
-        $packageName = $package->getName();
         $extensionKey = $this->getPackageExtensionKey($package);
         $installationSource = $this->filesystem->normalizePath($this->extractBaseDir($this->composer->getConfig()));
         $legacyPackagePath = $legacyExtPath . '/' . $extensionKey;
         $relativeLegacy = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
-        $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+
+        if (Platform::isWindows()) {
+            try {
+                $this->filesystem->junction($installationSource, $legacyPackagePath);
+                $linked = true;
+            } catch (IOException $e) {
+                $linked = false;
+            }
+        } else {
+            $linked = $this->filesystem->relativeSymlink($installationSource, $legacyPackagePath);
+        }
+
         if ($linked) {
             $this->io->info(sprintf('>> Linked root extension "%s" to "%s"', $package->getName(), $relativeLegacy));
         } else {
