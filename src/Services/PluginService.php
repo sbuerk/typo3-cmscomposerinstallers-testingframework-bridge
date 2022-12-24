@@ -113,6 +113,7 @@ final class PluginService
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
 
+            $linked = false;
             if (Platform::isWindows()) {
                 try {
                     $this->filesystem->junction($installationSource, $legacyPackagePath);
@@ -162,6 +163,7 @@ final class PluginService
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeExt = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
 
+            $linked = false;
             if (Platform::isWindows()) {
                 try {
                     $this->filesystem->junction($installationSource, $legacyPackagePath);
@@ -198,6 +200,7 @@ final class PluginService
         $legacyPackagePath = $legacyExtPath . '/' . $extensionKey;
         $relativeLegacy = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
 
+        $linked = false;
         if (Platform::isWindows()) {
             try {
                 $this->filesystem->junction($installationSource, $legacyPackagePath);
