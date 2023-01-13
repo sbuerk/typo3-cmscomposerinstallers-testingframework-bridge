@@ -1,6 +1,9 @@
 CHANGELOG for 0.x
 =================
 
+* 0.1.x
+  - [BUGFIX] Ensure root extension install does not drop dedicated extensions
+
 * 0.1.1
   - [BUGFIX] Support links on Windows systems - thanks to IchHabRecht
   - [TASK] Use correct homepage link in composer.json - thanks to IchHabRecht

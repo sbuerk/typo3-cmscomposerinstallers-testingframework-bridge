@@ -75,24 +75,31 @@ final class PluginService
 
     private function handleRootTypo3Extension(): void
     {
+        $this->ensureEmptyLegacyFolders();
         $this->linkRootExtensionToVendorFolder();
         $this->buildLegacySysExtMirror();
         $this->buildLegacyExtMirror();
-        $this->buildRootExtesionLegacyExtMirror();
+        $this->buildRootExtensionLegacyExtMirror();
     }
 
     private function handleRootProject(): void
     {
+        $this->ensureEmptyLegacyFolders();
         $this->buildLegacySysExtMirror();
         $this->buildLegacyExtMirror();
     }
 
+    private function ensureEmptyLegacyFolders(): void
+    {
+        $this->filesystem->emptyDirectory($this->getNormalizedLegacySystemExtensionPath(), true);
+        $this->filesystem->emptyDirectory($this->getNormalizedLegacyExtensionPath(), true);
+    }
+
     private function buildLegacySysExtMirror(): void
     {
-        $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
-        $legacySysExtPath = $this->filesystem->normalizePath($publicPath . '/typo3/sysext');
+        $legacySysExtPath = $this->getNormalizedLegacySystemExtensionPath();
         try {
-            $this->filesystem->emptyDirectory($legacySysExtPath, true);
+            $this->filesystem->ensureDirectoryExists($legacySysExtPath);
         } catch (\RuntimeException $exception) {
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacySysExtPath);
             $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
@@ -136,10 +143,9 @@ final class PluginService
 
     private function buildLegacyExtMirror(): void
     {
-        $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
-        $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
+        $legacyExtPath = $this->getNormalizedLegacyExtensionPath();
         try {
-            $this->filesystem->emptyDirectory($legacyExtPath, true);
+            $this->filesystem->ensureDirectoryExists($legacyExtPath);
         } catch (\RuntimeException $exception) {
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyExtPath);
             $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
@@ -184,12 +190,11 @@ final class PluginService
         }
     }
 
-    private function buildRootExtesionLegacyExtMirror(): void
+    private function buildRootExtensionLegacyExtMirror(): void
     {
-        $publicPath = $this->filesystem->normalizePath($this->getPublicPath());
-        $legacyExtPath = $this->filesystem->normalizePath($publicPath . '/typo3conf/ext');
+        $legacyExtPath = $this->getNormalizedLegacyExtensionPath();
         try {
-            $this->filesystem->emptyDirectory($legacyExtPath, true);
+            $this->filesystem->ensureDirectoryExists($legacyExtPath);
         } catch (\RuntimeException $exception) {
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyExtPath);
             $this->io->error(sprintf('>> Failed to create "%s" directory', $relativeSysext));
@@ -217,6 +222,21 @@ final class PluginService
         } else {
             $this->io->error(sprintf('>> Failed to link root extension "%s" "%s"', $package->getName(), $relativeLegacy));
         }
+    }
+
+    private function getNormalizedLegacySystemExtensionPath(): string
+    {
+        return rtrim($this->filesystem->normalizePath($this->getNormalizedPublicPath() . '/typo3/sysext'));
+    }
+
+    private function getNormalizedLegacyExtensionPath(): string
+    {
+        return rtrim($this->filesystem->normalizePath($this->getNormalizedPublicPath() . '/typo3conf/ext'), '/');
+    }
+
+    private function getNormalizedPublicPath(): string
+    {
+        return rtrim($this->filesystem->normalizePath($this->getPublicPath()), '/');
     }
 
     private function getPublicPath(): string
