@@ -1,5 +1,6 @@
 {
     "name": "sbuerk/typo3-cmscomposerinstallers-testingframework-bridge",
+    "description": "Compatibility patch for extension testing with TYPO3 v12",
     "type": "composer-plugin",
     "homepage": "https://github.com/sbuerk/typo3-cmscomposerinstallers-testingframework-bridge",
     "license": "GPL-2.0-or-later",
