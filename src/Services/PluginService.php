@@ -115,7 +115,7 @@ final class PluginService
                 continue;
             }
             $extensionKey = $this->getPackageExtensionKey($package);
-            $installationSource = $this->composer->getInstallationManager()->getInstallPath($package);
+            $installationSource = (string)$this->composer->getInstallationManager()->getInstallPath($package);
             $legacyPackagePath = $legacySysExtPath . '/' . $extensionKey;
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeSysext = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
@@ -164,7 +164,7 @@ final class PluginService
                 continue;
             }
             $extensionKey = $this->getPackageExtensionKey($package);
-            $installationSource = $this->composer->getInstallationManager()->getInstallPath($package);
+            $installationSource = (string)$this->composer->getInstallationManager()->getInstallPath($package);
             $legacyPackagePath = $legacyExtPath . '/' . $extensionKey;
             $relativeVendor = $this->filesystem->findShortestPath($this->rootPath(), $installationSource);
             $relativeExt = $this->filesystem->findShortestPath($this->rootPath(), $legacyPackagePath);
