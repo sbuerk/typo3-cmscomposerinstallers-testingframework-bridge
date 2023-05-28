@@ -22,7 +22,7 @@
         "composer-plugin-api": "^2.0.0"
     },
     "require-dev": {
-        "composer/composer": "2.0.*@dev",
+        "composer/composer": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.4.0",
         "overtrue/phplint": "^2.4.1",
         "phpstan/phpstan": "^1.8.4",
